@@ -11,18 +11,32 @@ const LikedSongs = () => {
     const navigate = useNavigate();
     const [tracks, setTracks] = useState([]);
     const [clickedTracks, setClickedTracks] = useState([]);
+    const [hasMore, setHasMore] = useState(true);
 
     // fetch data submitted by login form
 
     useEffect( () => {
         const fetchTracks = async () => {
             try {
-                const fetchedTracks = await axios.post('/api/music/fetchLikedSongs', {
-                    user,
-                });
+                const INITIAL_OFFSET = 0;
+                const LIMIT = 50;
+                let endpoint = `https://api.spotify.com/v1/me/tracks?limit=${LIMIT}&offset=${INITIAL_OFFSET}`
 
-                const extractedTracks = fetchedTracks.data.tracks;
-                setTracks(extractedTracks);
+                while(hasMore) {
+                    const fetchedTracks = await axios.post('/api/music/fetchLikedSongs', {
+                        user,
+                        endpoint,
+                    });
+
+                    if (fetchedTracks.data.nextPage !== null) {
+                        endpoint = fetchedTracks.data.nextPage;
+                        const extractedTracks = fetchedTracks.data.tracks;
+                        // ensures that as more tracks are retrieved they are rendered under
+                        setTracks((prevTracks) => [...prevTracks, ...extractedTracks]);
+                    } else {
+                        setHasMore(false);
+                    }
+                }
             } catch(err) {
                 console.error('Error fetching tracks: ', err);
             }

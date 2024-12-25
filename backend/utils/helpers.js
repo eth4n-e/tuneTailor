@@ -42,6 +42,36 @@ const addTracksToLikedSongsAPIReq = async (token, trackBatch) => {
   }
 } 
 
+const deleteLikedSongsHelper = async (token, trackIds) => {
+  try { 
+    const CHUNK_SIZE = 50;
+    let chunkedTracks = chunkArray(trackIds, CHUNK_SIZE);
+
+    const result = await Promise.allSettled(chunkedTracks.map(chunk => deleteLikedSongsAPIReq(token, chunk)));
+    
+    return result;
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+const deleteLikedSongsAPIReq = async (token, trackBatch) => {
+  try {
+    let trackEndpoint = `https://api.spotify.com/v1/me/tracks?ids=${trackBatch}`;
+    const result = await fetch(trackEndpoint, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        }
+    }).then(response => response.json());
+
+    return result;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 // paginate the request for getting a playlist's items
 const getPlaylistItems = async (token, id) => {
   try {
@@ -73,5 +103,6 @@ const getPlaylistItems = async (token, id) => {
 
 module.exports = {
   addTracksToLikedSongsHelper,
+  deleteLikedSongsHelper,
   getPlaylistItems
 }
