@@ -53,7 +53,7 @@ const NavBar = ({ user, itemIds, setClickedCards, setTracks = null }) => {
                 </li>
                 <li>
                     {location.pathname === '/likedsongs' ? (
-                        <button onClick={() => handleDeleteAllLiked()}className="text-brown3 bg-beige px-3 py-1.5 border-2 border-brown3 rounded-md hover:bg-brown3 hover:text-beige">Delete All</button>
+                        <button onClick={() => handleDeleteAllLiked(user.accessToken, setTracks)}className="text-brown3 bg-beige px-3 py-1.5 border-2 border-brown3 rounded-md hover:bg-brown3 hover:text-beige">Delete All</button>
                     ) : (
                         <button className="text-brown3 bg-beige px-3 py-1.5 border-2 border-brown3 rounded-md hover:bg-brown3 hover:text-beige">Add All</button>
                     )}

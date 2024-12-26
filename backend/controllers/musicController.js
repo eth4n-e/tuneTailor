@@ -1,4 +1,4 @@
-import { addTracksToLikedSongsHelper, deleteLikedSongsHelper, getPlaylistItems } from '../utils/helpers.js';
+import { addTracksToLikedSongsHelper, paginateLikedSongs, deleteLikedSongsHelper, getPlaylistItems } from '../utils/helpers.js';
 import pLimit from 'p-limit';
 
 // Purpose: implement the functionality of the routes, keep music.js (file for routes) clean
@@ -89,33 +89,6 @@ const fetchTopTracks = async (req, res) => {
         res.status(401).json({error: "Unable to fetch user's top tracks"});
     }
 }
-
-// const paginateTopTracks = async (endpoint, token, trackAmount) => {
-//     try {
-//         let tracks = []
-
-//         // retrieve top1000 tracks from different pages
-//         while(endpoint && tracks.length < trackAmount) {
-//             const trackResponse = await fetch(endpoint, {
-//                 method: "GET",
-//                 headers: {
-//                   Authorization: 'Bearer ' + token  
-//                 }
-//             })
-    
-//             const trackData = await trackResponse.json();
-
-//             // next stores endpoint to next page of tracks
-//             endpoint = trackData.next;
-
-//             tracks = tracks.concat(trackData.items);
-//         }
-
-//         return tracks;
-//     } catch(err) {
-//         throw new Error({error: 'Unable to retrieve list of top tracks'});
-//     }
-// }
 /** FETCH TOP TRACKS **/
 /**********************/
 
@@ -136,8 +109,15 @@ const deleteLikedSongs = async (req, res) => {
 
 const deleteAllLikedSongs = async (req, res) => {
     try {
-        let token = req.body.user.token;
+        let token = req.body.token;
+        const fetchedTracks = await paginateLikedSongs(token);
+        console.log("Fetched Tracks: ", fetchedTracks);
+        const trackIds = fetchedTracks.items.map(item => item.track.id);
 
+        console.log(trackIds);
+        const deleteResponse = await deleteLikedSongsHelper(token, trackIds);
+
+        res.status(200).json({"message": "Deleted all liked songs successfully"});
     } catch (err) {
         console.error(err);
     }
@@ -149,7 +129,7 @@ const deleteAllLikedSongs = async (req, res) => {
 /** ADD TRACKS **/
 const addTracksToLikedSongs = async (req, res) => {
     try {
-        let trackIds = req.body.idList;
+        let trackIds = req.body.itemIds;
         let token = req.body.user.accessToken;
         
         const addResult = await addTracksToLikedSongsHelper(token, trackIds);

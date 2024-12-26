@@ -18,9 +18,8 @@ const LikedSongs = () => {
     useEffect( () => {
         const fetchTracks = async () => {
             try {
-                const INITIAL_OFFSET = 0;
                 const LIMIT = 50;
-                let endpoint = `https://api.spotify.com/v1/me/tracks?limit=${LIMIT}&offset=${INITIAL_OFFSET}`
+                let endpoint = `https://api.spotify.com/v1/me/tracks?limit=${LIMIT}`
 
                 while(hasMore) {
                     const fetchedTracks = await axios.post('/api/music/fetchLikedSongs', {

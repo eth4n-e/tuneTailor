@@ -38,11 +38,13 @@ const TopTracks = () => {
                         setHasMore(false);
                     }
                 }
+
+                console.log(topTracks);
             } catch(err) {
                 console.error('Error fetching tracks: ', err);
             }    
         }
-        
+
         fetchTopTracks(user);
     }, [user]);
 
