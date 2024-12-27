@@ -1,22 +1,15 @@
-const querystring = require('querystring');
-require('dotenv').config();
+import querystring from 'querystring';
+import dotenv from 'dotenv';
+dotenv.config();
+import { generateRandomString } from '../utils/helpers.js';
 
 // client credentials / necessary data for spotify requests
 const CLIENT_ID = process.env.CLIENT_ID;
 const REDIRECT_URI = 'http://localhost:3000/login'; // url to redirect back to after authorization
 
-/** HELPER METHOD TO IMPLEMENT SPOTIFY AUTHORIZATION FLOW **/
-// method to generate a code verifier (high-entropy cryptographic string)
-const generateRandomString = (length) => {
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const values = crypto.getRandomValues(new Uint8Array(length));
-    return values.reduce((acc, x) => acc + possible[x % possible.length], "");
-}
-/** HELPER METHOD TO IMPLEMENT SPOTIFY AUTHORIZATION FLOW **/
-
 /*******************/
 /** AUTHORIZATION **/
-const redirectToSpotifyAuth = async (req, res) => {
+export const redirectToSpotifyAuth = async (req, res) => {
     const codeChallenge = req.body.codeChallenge;
     // protection against attacks
     const state = generateRandomString(16).trimStart();
@@ -46,8 +39,3 @@ const redirectToSpotifyAuth = async (req, res) => {
 }
 /** AUTHORIZATION **/
 /*******************/
-
-module.exports = {
-    redirectToSpotifyAuth,
-    generateRandomString
-}

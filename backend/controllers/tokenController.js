@@ -1,31 +1,33 @@
-const { URLSearchParams } = require('url');
-require("dotenv").config;
-const User = require('../models/userModel');
-const mongoose = require('mongoose');
+import { URLSearchParams } from 'url';
+import dotenv from 'dotenv';
+dotenv.config();
+import User from '../models/userModel.js';
+import mongoose from 'mongoose';
 
 // client credentials / necessary data for spotify requests
 const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
 // const clientSecret = process.env.CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:3000/login'; // url to redirect back to after authorization
 
 /*************************************************************/
 /** HELPER METHOD TO CHECK REFRESH TOKEN AND UPDATE DB USER */
-const updateTokenDB = async (userDB, token) => {
-    userDB.accessToken = token.access_token;
+export const updateTokenDB = async (user, token) => {
+    user.accessToken = token.access_token;
     // refresh tokens are not always generated, in these instances default to the user's existing refreshToken
-    userDB.refreshToken = token.refresh_token || userDB.refreshToken;
+    user.refreshToken = token.refresh_token || user.refreshToken;
     // additions to Date.now() are in milliseconds
     // tokens last for 1 hour (3600 seconds or 3600 * 1000 milliseconds)
-    userDB.tokenExpiration = Date.now() + token.expires_in * 1000;
+    user.tokenExpiration = Date.now() + token.expires_in * 1000;
 
-    await userDB.save();
+    await user.save();
 }
 /** HELPER METHOD TO CHECK REFRESH TOKEN AND UPDATE DB USER */
 /*************************************************************/
 
 /***************************/
 /** ACCESS TOKEN EXCHANGE **/
-const getAccessToken = async (code, codeVerifier) => {
+export const getAccessToken = async (code, codeVerifier) => {
     try {
         const tokenEndpoint = "https://accounts.spotify.com/api/token";
         // fetch does not support form property (reason behind using body property)
@@ -54,24 +56,20 @@ const getAccessToken = async (code, codeVerifier) => {
 
 /*******************/
 /** REFRESH TOKEN **/
-const refreshToken = async (refreshToken) => {
+export const refreshToken = async (refreshToken) => {
     try {
-        const url = 'https://accounts.spotify.com/api/token';
-    
-        const headers = new Headers({
-            'Content-Type': 'application/x-www-form-urlencoded',
-        });
+        const endpoint = 'https://accounts.spotify.com/api/token';
 
-        const body = new URLSearchParams({
-            grant_type: 'refresh_token',
-            refresh_token: refreshToken,
-            client_id: CLIENT_ID,
-        });
-
-        const updatedToken = await fetch(url, {
+        const updatedToken = await fetch(endpoint, {
             method: 'POST',
-            headers: headers,
-            body: body
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Basic ' + (new Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'))
+            },
+            body: new URLSearchParams({
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken,
+            }).toString()
         });
 
         return await updatedToken.json();
@@ -82,9 +80,3 @@ const refreshToken = async (refreshToken) => {
 }
 /** REFRESH TOKEN **/
 /*******************/
-
-module.exports = {
-    updateTokenDB,
-    getAccessToken,
-    refreshToken,
-}

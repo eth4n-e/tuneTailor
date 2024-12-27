@@ -1,19 +1,19 @@
-const express = require('express');
-const {
+import express from 'express';
+import  {
     redirectToSpotifyAuth,
-} = require('../controllers/authController');
+} from '../controllers/authController.js';
 
-const {
+import {
     getAccessToken,
-} = require('../controllers/tokenController');
+} from '../controllers/tokenController.js';
 
-const {
+import {
     getUserSession,
     updateUser,
     login
-} = require('../controllers/userController');
+} from '../controllers/userController.js';
 
-const { 
+import { 
     fetchLikedSongs,
     fetchPlaylists,
     fetchTopTracks,
@@ -21,7 +21,7 @@ const {
     deleteAllLikedSongs,
     addTracksToLikedSongs,
     addTracksFromPlaylistsToLikedSongs
-} = require('../controllers/musicController');
+} from '../controllers/musicController.js';
 
 // use expresses router to handle all routes
 const router = express.Router();
@@ -50,4 +50,4 @@ router.delete('/deleteLikedSongs', deleteLikedSongs);
 router.delete('/deleteAllLikedSongs', deleteAllLikedSongs);
 
 // export router for use in server.js
-module.exports = router;
+export default router;

@@ -1,6 +1,7 @@
 import {React, useState} from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { socket } from '../utils/socket.js';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -32,6 +33,8 @@ const Login = () => {
                 email,
                 password,
             });
+
+            socket.connect();
 
             navigate('/likedsongs')
         } catch (err) {

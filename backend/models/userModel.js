@@ -1,5 +1,5 @@
 // use mongoose to organize and manage data / relationships
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // store schema function
 const Schema = mongoose.Schema
@@ -36,4 +36,4 @@ const userSchema = new Schema({
     }, 
 })
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);

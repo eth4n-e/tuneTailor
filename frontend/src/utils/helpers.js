@@ -80,6 +80,7 @@ export const userLoader = async function() {
     try {
       const userSession = await axios.get('/api/music/getUser');
   
+      console.log("user from getUser endpoint: ", userSession);
       let user = userSession.data.user;
       
       if(Date.now() >= user.tokenExpiration) {

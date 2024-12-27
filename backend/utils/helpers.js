@@ -1,3 +1,10 @@
+// method to generate a code verifier (high-entropy cryptographic string)
+export const generateRandomString = (length) => {
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const values = crypto.getRandomValues(new Uint8Array(length));
+  return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+}
+
 const chunkArray = (array, chunkSize) => {
     // ensure that the incoming array is 1D
     const flatArr = array.flat();
@@ -9,7 +16,7 @@ const chunkArray = (array, chunkSize) => {
     return result;
 }
 
-const addTracksToLikedSongsHelper = async (token, trackIds) => {
+export const addTracksToLikedSongsHelper = async (token, trackIds) => {
   try { 
     const CHUNK_SIZE = 50;
     let chunkedTracks = chunkArray(trackIds, CHUNK_SIZE);
@@ -66,7 +73,7 @@ const filterTrackIds = async (token, trackIds) => {
   }
 }
 
-const deleteLikedSongsHelper = async (token, trackIds) => {
+export const deleteLikedSongsHelper = async (token, trackIds) => {
   try { 
     console.log("Initiated call to deleteLikedSongsHelper");
     const CHUNK_SIZE = 50;
@@ -98,7 +105,7 @@ const deleteLikedSongsAPIReq = async (token, trackBatch) => {
 }
 
 // paginate the request for getting a playlist's items
-const getPlaylistItems = async (token, id) => {
+export const getPlaylistItems = async (token, id) => {
   try {
     let tracks = [];
     let endpoint = `https://api.spotify.com/v1/playlists/${id}/tracks`;
@@ -126,7 +133,7 @@ const getPlaylistItems = async (token, id) => {
   }
 }
 
-const paginateLikedSongs = async (token) => {
+export const paginateLikedSongs = async (token) => {
   try {
     const LIMIT = 50;
     let tracks = [];
@@ -153,11 +160,4 @@ const paginateLikedSongs = async (token) => {
   } catch (err) {
     console.error(err);
   }
-}
-
-module.exports = {
-  addTracksToLikedSongsHelper,
-  deleteLikedSongsHelper,
-  paginateLikedSongs,
-  getPlaylistItems
 }

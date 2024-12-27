@@ -1,15 +1,15 @@
-const User = require('../models/userModel');
-const mongoose = require('mongoose');
+import User from '../models/userModel.js';
+import mongoose from 'mongoose';
 
-const {
+import {
     getAccessToken,
     updateTokenDB,
     refreshToken,
-} = require('./tokenController');
+} from './tokenController.js';
 
 /****************************************/
 /** USER RETRIEVAL + CREATION + UPDATE **/
-const getUserInfoSpotify = async (accessToken) => {
+export const getUserInfoSpotify = async (accessToken) => {
     // use spotify's get current user profile API route to retrieve user name and email associated with user
     try {
         const userResponse = await fetch('https://api.spotify.com/v1/me', {
@@ -29,7 +29,7 @@ const getUserInfoSpotify = async (accessToken) => {
 }
 
 // use information from the users profile, email, password, and token to create a user
-const createUser = async (token, profile, email, password) => {
+export const createUser = async (token, profile, email, password) => {
     try {
         // extract information needed for a new user
         const username = profile.display_name;
@@ -57,7 +57,7 @@ const createUser = async (token, profile, email, password) => {
     }
 }
 
-const getUserSession = (req, res) => {
+export const getUserSession = (req, res) => {
     if(!req.session.user) {
         return res.status(401).json({message: 'Unauthorized'})
     }
@@ -67,11 +67,10 @@ const getUserSession = (req, res) => {
     })
 }
 
-const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
     try {
         // current session's user passed in body of request
         const user = req.body.user.data.user;
-        console.log(user);
 
         const userDB = await User.findById({_id: user._id}).exec();
 
@@ -98,7 +97,7 @@ const updateUser = async (req, res) => {
 
 /***********/
 /** LOGIN **/
-const login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
@@ -114,7 +113,8 @@ const login = async (req, res) => {
             user = await createUser(token, profile, email, password);
         } else if(user && user.email == email && user.password == password) { // verify that email and password match the user's credentials
             const updatedToken = await refreshToken(user.refreshToken);
-
+        
+            console.log('Refreshed token: ', updatedToken);
             // refreshToken does not always return a new token so only update when it does
             if(updatedToken) { 
                 updateTokenDB(user, updatedToken);
@@ -131,11 +131,3 @@ const login = async (req, res) => {
 }
 /** LOGIN **/
 /***********/
-
-module.exports = {
-    getUserInfoSpotify,
-    createUser,
-    getUserSession,
-    updateUser,
-    login,
-}

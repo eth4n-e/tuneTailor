@@ -1,19 +1,16 @@
 // get access to .env variables
-require('dotenv').config()
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const MongoStore = require('connect-mongo');
-const musicRoutes = require('./routes/music');
-const session = require('express-session');
+import dotenv from 'dotenv';
+dotenv.config();
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import MongoStore from 'connect-mongo';
+import router from './routes/music.js';
+import session from 'express-session';
+import { Server } from 'socket.io';
+import { createServer } from 'node:http';
 // create express app
 const app = express();
-
-// use MongoDB to store sessions
-const sessionStore = MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    collectionName: 'sessions',
-});
 
 const corsOptions = {
     origin: 'http://localhost:3000'
@@ -26,6 +23,12 @@ const corsOptions = {
     // e.g. define localhost as origin, only localhost can get data / access backend resources
 app.use(cors(corsOptions));
     
+// use MongoDB to store sessions
+const sessionStore = MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    collectionName: 'sessions',
+});
+
 // setup sessions
 app.use(
     session({
@@ -35,25 +38,40 @@ app.use(
       store: sessionStore,
       cookie: { secure: false } // Set to true if using HTTPS
     })
-  );
+);
+
 // parse data sent in request into json
 app.use(express.json());
+
 app.use((req, res, next) => {
     // log path and request method
-    console.log(req.path, req.method);
+    // console.log(req.path, req.method);
     // transfer to next request / middleware function
     next();
 })
 
 // use routes defined in music.js
-app.use('/api/music', musicRoutes);
+app.use('/api/music', router);
 
+// database connection
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         // listen for requests only after successfully connecting 
         app.listen(process.env.PORT, () => {
-        console.log('connected to db & listening on port', process.env.PORT);
+            console.log('connected to db & listening on port', process.env.PORT);
         });
     }).catch((err) => {
         console.log(err)
-    })
+});
+
+
+const server = createServer(app);
+const io = new Server(server);
+// structure: io.on( event, (connectionBetweenServerAndClient) => {
+//      ... handle events 
+// })
+// io is used to maintain connection between server and client
+// allows server to respond to events initiated by client where socket param represents the specific connection
+io.on('connection', (socket) => {
+    console.log('User connected');
+})
