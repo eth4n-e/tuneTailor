@@ -3,7 +3,11 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema
 
 const likedSongsSchema = new Schema({
-    _id: {
+    userId: {
+        type: String,
+        required: true,
+    },
+    trackId: {
         type: String,
         required: true,
     },
@@ -20,9 +24,10 @@ const likedSongsSchema = new Schema({
         required: true,
     },
     addedAt: {
+        // type: Date
         type: String,
         required: true,
     }
 })
 
-export default mongoose.model('LikedSongsModel', likedSongsSchema);
+export default mongoose.model('LikedSongs', likedSongsSchema);

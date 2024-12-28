@@ -113,17 +113,14 @@ export const login = async (req, res) => {
             user = await createUser(token, profile, email, password);
         } else if(user && user.email == email && user.password == password) { // verify that email and password match the user's credentials
             const updatedToken = await refreshToken(user.refreshToken);
-        
-            console.log('Refreshed token: ', updatedToken);
             // refreshToken does not always return a new token so only update when it does
             if(updatedToken) { 
                 updateTokenDB(user, updatedToken);
             }
         }
         req.session.user = user;
-        console.log(req.session.user);
 
-        return res.status(200).json({user: user});
+        return res.status(200).json({user});
     } catch(err) {
         console.error(err);
         res.status(400).json({error: err});

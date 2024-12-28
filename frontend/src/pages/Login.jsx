@@ -26,7 +26,7 @@ const Login = () => {
             }
 
             // create user / return existing user
-            await axios.post('/api/music/login', {
+            const userResponse = await axios.post('/api/music/login', {
                 code,
                 codeVerifier,
                 state,
@@ -34,7 +34,13 @@ const Login = () => {
                 password,
             });
 
+            const user = userResponse.data.user;
+            // create connection between client and server only on successful login
             socket.connect();
+            // asynchronous events to be handled by server
+            socket.emit('startProcessingLikedSongs', user);
+            // socket.emit('startProcessingTopTracks', user);
+            // socket.emit('startProcessingPlaylists', user);
 
             navigate('/likedsongs')
         } catch (err) {

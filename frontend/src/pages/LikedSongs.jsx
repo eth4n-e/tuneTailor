@@ -3,6 +3,7 @@ import { useNavigate, useLoaderData } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import TrackCard from '../components/TrackCard';
 import axios from 'axios';
+import { socket } from '../utils/socket.js'
 import { createHandleCardClick } from '../utils/helpers';
 import ClickedTrackCard from '../components/ClickedTrackCard';
 
@@ -18,24 +19,28 @@ const LikedSongs = () => {
     useEffect( () => {
         const fetchTracks = async () => {
             try {
-                const LIMIT = 50;
-                let endpoint = `https://api.spotify.com/v1/me/tracks?limit=${LIMIT}`
+                // const LIMIT = 50;
+                // let endpoint = `https://api.spotify.com/v1/me/tracks?limit=${LIMIT}`
 
-                while(hasMore) {
-                    const fetchedTracks = await axios.post('/api/music/fetchLikedSongs', {
-                        user,
-                        endpoint,
-                    });
+                // while(hasMore) {
+                //     const fetchedTracks = await axios.post('/api/music/fetchLikedSongs', {
+                //         user,
+                //         endpoint,
+                //     });
 
-                    if (fetchedTracks.data.nextPage !== null) {
-                        endpoint = fetchedTracks.data.nextPage;
-                        const extractedTracks = fetchedTracks.data.tracks;
-                        // ensures that as more tracks are retrieved they are rendered under
-                        setTracks((prevTracks) => [...prevTracks, ...extractedTracks]);
-                    } else {
-                        setHasMore(false);
-                    }
-                }
+                //     if (fetchedTracks.data.nextPage !== null) {
+                //         endpoint = fetchedTracks.data.nextPage;
+                //         const extractedTracks = fetchedTracks.data.tracks;
+                //         // ensures that as more tracks are retrieved they are rendered under
+                //         setTracks((prevTracks) => [...prevTracks, ...extractedTracks]);
+                //     } else {
+                //         setHasMore(false);
+                //     }
+                // }
+                socket.on('likedSongsChunk', (tracks) => {
+                    console.log(tracks);
+                    setTracks((prevTracks) => [...prevTracks, tracks]);
+                })
             } catch(err) {
                 console.error('Error fetching tracks: ', err);
             }
