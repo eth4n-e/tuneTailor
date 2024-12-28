@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLoaderData } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import TrackCard from '../components/TrackCard';
 import axios from 'axios';
@@ -7,40 +7,42 @@ import { socket } from '../utils/socket.js'
 import { createHandleCardClick } from '../utils/helpers';
 import ClickedTrackCard from '../components/ClickedTrackCard';
 
+
+// possible infinite scroll to allow for tracks to be requested only when user scrolls to bottom
+// const handleScroll = (event) => {
+//     const { scrollTop, scrollHeight, clientHeight } = event.target;
+//     if (scrollHeight - scrollTop <= clientHeight) {
+//         // Request the next chunk when scrolled to the bottom
+//         socket.emit('requestLikedSongs', userId);
+//     }
+// };
+
+// return (
+//     <div onScroll={handleScroll}>
+//         {tracks.map((track) => (
+//             <TrackCard key={track.id} track={track} handleCardClick={handleCardClick} />
+//         ))}
+//     </div>
+// );
+
+
 const LikedSongs = () => {
     const user = useLoaderData();
-    const navigate = useNavigate();
     const [tracks, setTracks] = useState([]);
     const [clickedTracks, setClickedTracks] = useState([]);
-    const [hasMore, setHasMore] = useState(true);
-
-    // fetch data submitted by login form
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect( () => {
         const fetchTracks = async () => {
             try {
-                // const LIMIT = 50;
-                // let endpoint = `https://api.spotify.com/v1/me/tracks?limit=${LIMIT}`
+                socket.on('likedSongsChunk', (trackChunk) => {
+                    setTracks((prevTracks) => [...prevTracks, ...trackChunk]);
+                    setIsLoading(false);
+                });
 
-                // while(hasMore) {
-                //     const fetchedTracks = await axios.post('/api/music/fetchLikedSongs', {
-                //         user,
-                //         endpoint,
-                //     });
-
-                //     if (fetchedTracks.data.nextPage !== null) {
-                //         endpoint = fetchedTracks.data.nextPage;
-                //         const extractedTracks = fetchedTracks.data.tracks;
-                //         // ensures that as more tracks are retrieved they are rendered under
-                //         setTracks((prevTracks) => [...prevTracks, ...extractedTracks]);
-                //     } else {
-                //         setHasMore(false);
-                //     }
-                // }
-                socket.on('likedSongsChunk', (tracks) => {
-                    console.log(tracks);
-                    setTracks((prevTracks) => [...prevTracks, tracks]);
-                })
+                return () => {
+                    socket.off('likedSongsChunk');
+                }
             } catch(err) {
                 console.error('Error fetching tracks: ', err);
             }
@@ -52,22 +54,28 @@ const LikedSongs = () => {
     const handleCardClick = createHandleCardClick(setClickedTracks);
 
     return (
-        <div className="w-100 bg-beige">
-            <NavBar user={user} itemIds={clickedTracks} setClickedCards={setClickedTracks} setTracks={setTracks}/>
-            <div className='mt-4 mx-4 pb-4 grid grid-cols-4 gap-6'>
-                {
-                    tracks && (tracks.map( (track) => (
-                        clickedTracks.includes(track.id) ? (
-                            <ClickedTrackCard track={track} handleCardClick={handleCardClick} key={track.id}/>
-                        ) : (
-                            <TrackCard track={track} handleCardClick={handleCardClick} key={track.id}/>
-                        )
-                    )))
-                }
-            </div>
-        </div>
+    <div className="w-100 bg-beige">
+        { isLoading ? (
+            <div>Liked Songs are loading...</div>
+        ) : (
+            <>
+                <NavBar user={user} itemIds={clickedTracks} setClickedCards={setClickedTracks} setTracks={setTracks}/>
+                <div className='mt-4 mx-4 pb-4 grid grid-cols-4 gap-6'>
+                    {
+                        tracks && (tracks.map( (track) => (
+                            clickedTracks.includes(track.id) ? (
+                                <ClickedTrackCard track={track} handleCardClick={handleCardClick} key={track.id}/>
+                            ) : (
+                                <TrackCard track={track} handleCardClick={handleCardClick} key={track.id}/>
+                            )
+                        )))
+                    }
+                </div>
+            </>
+        )
+        }  
+    </div>
     )
-
 }
 
 export default LikedSongs

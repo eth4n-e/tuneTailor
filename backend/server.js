@@ -97,9 +97,8 @@ io.on('connection', (socket) => {
             }
 
             trackItems.forEach(async (item) => {
-                console.log('Track item', item);
-
                 const addedAt = item.added_at;
+            
                 const track = item.track;
                 const trackId = track.id;
                 const songName = track.name;
