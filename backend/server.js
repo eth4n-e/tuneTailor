@@ -1,6 +1,5 @@
 // get access to .env variables
 import dotenv from 'dotenv';
-dotenv.config();
 import express from 'express';
 import mongoose from 'mongoose';
 import MongoStore from 'connect-mongo';
@@ -10,7 +9,7 @@ import session from 'express-session';
 import { Server } from 'socket.io';
 import { createServer } from 'node:http';
 // create express app
-export const app = express();
+const app = express();
 const server = createServer(app);
 // socket io requires enabling cors, essentially allows for requests / connections from the provided origin (frontend)
 const io = new Server(server, {
@@ -19,6 +18,12 @@ const io = new Server(server, {
     }
 });
     
+if (process.env.NODE_ENV !== 'test') {
+    dotenv.config();
+} else {
+    dotenv.config({path: '.env.test'});
+}
+
 // use MongoDB to store sessions
 const sessionStore = MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
@@ -122,14 +127,30 @@ io.on('connection', (socket) => {
     })
 });
 
-// database connection and starting http server
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        // listen for requests only after successfully connecting 
-        server.listen(process.env.PORT, () => {
-            console.log('connected to DB and started http server at port', process.env.PORT);
-        });
-    }).catch((err) => {
-        console.log(err)
-});
+// // database connection and starting http server
+// mongoose.connect(process.env.MONGO_URI)
+//     .then(() => {
+//         // listen for requests only after successfully connecting 
+//         server.listen(process.env.PORT, () => {
+//             console.log('connected to DB and started http server at port', process.env.PORT);
+//         });
+//     }).catch((err) => {
+//         console.log(err)
+// });
 
+const startServer = async () => {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connected to database");
+
+    const httpServer = server.listen(process.env.PORT, () => {
+        console.log('Started http server at port', process.env.PORT);
+    });
+
+    return httpServer;
+}
+
+if (process.env.NODE_ENV !== 'test') {
+    startServer().catch(err => console.error("Unable to start connect to database or start server: ", err));
+}
+
+export { app, startServer };
