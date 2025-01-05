@@ -1,10 +1,9 @@
 import { addTracksToLikedSongsHelper, paginateLikedSongs, deleteLikedSongsHelper, getPlaylistItems } from '../utils/helpers.js';
-import pLimit from 'p-limit';
 
 // Purpose: implement the functionality of the routes, keep music.js (file for routes) clean
 /***********************/
 /** FETCH LIKED SONGS **/
-const fetchLikedSongs = async (req, res) => {
+export const fetchLikedSongs = async (req, res) => {
     try {
         const token = req.body.user.accessToken;
         const endpoint = req.body.endpoint;
@@ -35,7 +34,7 @@ const fetchLikedSongs = async (req, res) => {
 
 /*********************/
 /** FETCH PLAYLISTS **/
-const fetchPlaylists = async (req, res) => {
+export const fetchPlaylists = async (req, res) => {
     const user = req.body.user;
 
     try {
@@ -62,7 +61,7 @@ const fetchPlaylists = async (req, res) => {
 
 /**********************/
 /** FETCH TOP TRACKS **/
-const fetchTopTracks = async (req, res) => {
+export const fetchTopTracks = async (req, res) => {
     try {
         const token = req.body.user.accessToken;
         const endpoint = req.body.endpoint;
@@ -94,7 +93,7 @@ const fetchTopTracks = async (req, res) => {
 
 /************************/
 /** DELETE LIKED SONGS **/
-const deleteLikedSongs = async (req, res) => {
+export const deleteLikedSongs = async (req, res) => {
     try {
         let trackIds = req.body.idList;
         let token = req.body.user.accessToken;
@@ -107,7 +106,7 @@ const deleteLikedSongs = async (req, res) => {
     }
 }
 
-const deleteAllLikedSongs = async (req, res) => {
+export const deleteAllLikedSongs = async (req, res) => {
     try {
         let token = req.body.token;
         const fetchedTracks = await paginateLikedSongs(token);
@@ -127,7 +126,7 @@ const deleteAllLikedSongs = async (req, res) => {
 
 /****************/
 /** ADD TRACKS **/
-const addTracksToLikedSongs = async (req, res) => {
+export const addTracksToLikedSongs = async (req, res) => {
     try {
         let trackIds = req.body.itemIds;
         let token = req.body.user.accessToken;
@@ -140,7 +139,7 @@ const addTracksToLikedSongs = async (req, res) => {
     }
 }
 
-const addAllTracksToLikedSongs = async (req, res) => {
+export const addAllTracksToLikedSongs = async (req, res) => {
 
 }
 /** ADD TRACKS **/
@@ -148,7 +147,7 @@ const addAllTracksToLikedSongs = async (req, res) => {
 
 /*******************/
 /** ADD PLAYLISTS **/
-const addTracksFromPlaylistsToLikedSongs = async (req, res) => {
+export const addTracksFromPlaylistsToLikedSongs = async (req, res) => {
     try {
         let playlistIds = req.body.itemIds;
         let token = req.body.user.accessToken;
@@ -167,18 +166,8 @@ const addTracksFromPlaylistsToLikedSongs = async (req, res) => {
     }
 }
 
-const addTracksFromAllPlaylists = async (req, res) => {
+export const addTracksFromAllPlaylists = async (req, res) => {
 
 }
 /** ADD PLAYLISTS **/
 /*******************/
-
-export {
-    fetchLikedSongs,
-    fetchPlaylists,
-    fetchTopTracks,
-    addTracksToLikedSongs,
-    deleteLikedSongs,
-    deleteAllLikedSongs,
-    addTracksFromPlaylistsToLikedSongs,
-}

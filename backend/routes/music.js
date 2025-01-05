@@ -27,27 +27,27 @@ import {
 const router = express.Router();
 
 // configure route to be associated with particular controllers
-router.post('/login', login);
+router.post('/user/login', login);
 
-router.post('/auth', redirectToSpotifyAuth);
+router.post('/auth/redirectToSpotify', redirectToSpotifyAuth);
 
-router.get('/getUser', getUserSession);
+router.get('/user/getUser', getUserSession);
 
-router.post('/fetchLikedSongs', fetchLikedSongs);
+router.post('/music/fetchLikedSongs', fetchLikedSongs);
 
-router.put('/updateUser', updateUser)
+router.put('/user/updateUser', updateUser)
 
-router.post('/fetchPlaylists', fetchPlaylists);
+router.post('/music/fetchPlaylists', fetchPlaylists);
 
-router.post('/fetchTopTracks', fetchTopTracks);
+router.post('/music/fetchTopTracks', fetchTopTracks);
 
-router.put('/addTracksToLikedSongs', addTracksToLikedSongs);
+router.put('/music/addTracksToLikedSongs', addTracksToLikedSongs);
 
-router.put('/addTracksFromPlaylistsToLikedSongs', addTracksFromPlaylistsToLikedSongs);
+router.put('/music/addTracksFromPlaylistsToLikedSongs', addTracksFromPlaylistsToLikedSongs);
 
-router.delete('/deleteLikedSongs', deleteLikedSongs);
+router.delete('/music/deleteLikedSongs', deleteLikedSongs);
 
-router.delete('/deleteAllLikedSongs', deleteAllLikedSongs);
+router.delete('/music/deleteAllLikedSongs', deleteAllLikedSongs);
 
 // export router for use in server.js
 export default router;

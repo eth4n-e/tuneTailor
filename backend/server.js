@@ -10,7 +10,7 @@ import session from 'express-session';
 import { Server } from 'socket.io';
 import { createServer } from 'node:http';
 // create express app
-const app = express();
+export const app = express();
 const server = createServer(app);
 // socket io requires enabling cors, essentially allows for requests / connections from the provided origin (frontend)
 const io = new Server(server, {
@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 })
 
 // use routes defined in music.js
-app.use('/api/music', router);
+app.use('/api', router);
 
 // io represents the socket.io server listening to all incoming connections from clients
 // it is built on top of the http server and handles WebSocket events
