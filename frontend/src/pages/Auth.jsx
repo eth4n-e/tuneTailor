@@ -37,7 +37,7 @@ const Auth = () => {
                 const codeChallenge = base64encode(hashed).trimStart();
 
                 // make request to server to receive back the spotify authorization url
-                const response = await axios.post('/api/music/auth', { 
+                const response = await axios.post('/api/auth/redirectToSpotify', { 
                     headers: {
                         'Access-Control-Allow-Origin': 'http://localhost:3000/',
                     }, codeChallenge });

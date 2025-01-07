@@ -14,18 +14,26 @@ beforeAll(async () => {
 });
 
 test('POST /api/auth/redirectToSpotify', async () => {
-    const codeChallenge = generateRandomString(64);
+    try {
+        const codeChallenge = generateRandomString(64);
 
-    await supertest(app)
-                .post('/api/auth/redirectToSpotify')
-                .send({codeChallenge: codeChallenge})
-                .expect(200)
-                .then(response => {
-                    console.log(response);
-                    // get the the query parameters from the url
-                    // assert that it has things like the codeChallenge, scopes, etc. present 
-                    // assert that it has all necessary information to perform the request / redirect
-                })
+        const response = await supertest(app)
+                    .post('/api/auth/redirectToSpotify')
+                    .send({codeChallenge: codeChallenge})
+                    .expect(200);
+
+        const responseUrl = new URL(response.body.auth_data);
+        const queryParams = new URLSearchParams(responseUrl.search);
+
+        // required query params to redirect to spotify
+        expect(queryParams.get('response_type')).toBe('code');
+        expect(queryParams.get('code_challenge_method')).toBe('S256'); // PKCE flow uses SHA256 algorithm
+        expect(queryParams.get('client_id')).toBeDefined();
+        expect(queryParams.get('redirect_uri')).toBeDefined();
+        expect(queryParams.get('code_challenge')).toBeDefined();
+    } catch (error) {
+        console.error(error);
+    }
 });
 
 afterAll(async () => {
