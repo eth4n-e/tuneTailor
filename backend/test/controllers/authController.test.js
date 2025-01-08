@@ -7,11 +7,7 @@ import { app, startServer } from '../../server.js';
 - test syntax is essentially the same as it
 - using test syntax here because it is already clear that I will be testing the functionality of my authControllers
 */
-let server;
-
-beforeAll(async () => {
-    server = await startServer();
-});
+// let server;
 
 test('POST /api/auth/redirectToSpotify', async () => {
     try {
@@ -34,8 +30,4 @@ test('POST /api/auth/redirectToSpotify', async () => {
     } catch (error) {
         console.error(error);
     }
-});
-
-afterAll(async () => {
-    await server.close();
 });
