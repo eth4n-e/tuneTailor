@@ -7,6 +7,7 @@ export const createMockSuccessResponse = (data, options = {}) => ({
     ...options
 });
 
+// mock response from fetch api when error has occurred in request
 export const createMockErrorResponse = () => ({
     message: "Error fetching resource",
     status: 404,

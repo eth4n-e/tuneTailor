@@ -76,12 +76,9 @@ export const updateUser = async (req, res) => {
 
         if(userDB) {
             const updatedToken = await refreshToken(user.refreshToken);
-
-            if(updatedToken) {
-                updateTokenDB(userDB, updatedToken);
-                // update session information if updates to user occur
-                req.session.user = userDB
-            }
+            updateTokenDB(userDB, updatedToken);
+            // update session information if updates to user occur
+            req.session.user = userDB
         }
 
         // if no updates occur, req.session.user will correspond to the user set from login

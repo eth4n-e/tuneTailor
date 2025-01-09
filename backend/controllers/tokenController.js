@@ -74,7 +74,6 @@ export const refreshToken = async (refreshToken) => {
 
         return await updatedToken.json();
     } catch (err) {
-        console.error(err);
         throw new Error({error: 'Unable to refresh spotify token'});
     }
 }
