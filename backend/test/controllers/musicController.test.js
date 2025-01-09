@@ -47,13 +47,22 @@ const MOCK_TRACK = {
 
 describe('POST /api/music/fetchLikedSongs', () => {
     it('should fetch 50 liked songs of a user on a successful request', async () => {
-        const MOCK_TRACKSET = new Array(50).fill(MOCK_TRACK);
+        const MOCK_TRACKSET = {
+            "next": "nextUrl",
+            "offset": 0,
+            "items": new Array(50).fill({
+                "added_at": new Date(),
+                "track": {
+                    ...MOCK_TRACK
+                }
+            })
+        };
 
         global.fetch = jest.fn().mockResolvedValue(
             createMockSuccessResponse(MOCK_TRACKSET)
         );
         
-        const fetchedTracks = await supertest(app)
+        const response = await supertest(app)
                             .post('/api/music/fetchLikedSongs')
                             .send({
                                 user: MOCK_USER,
@@ -61,17 +70,18 @@ describe('POST /api/music/fetchLikedSongs', () => {
                             })
                             .expect(200);
 
+        const fetchedTracks = response.body;
         expect(fetchedTracks).toHaveProperty("tracks");
         expect(fetchedTracks).toHaveProperty("nextPage");
         
         const tracks = fetchedTracks.tracks;
-        expect(tracks.length).toEqual(MOCK_TRACKSET.length);
+        expect(tracks.length).toEqual(MOCK_TRACKSET.items.length);
         const firstTrack = tracks[0];
-        expect(tracks).toHaveProperty("album");
-        expect(tracks.album).toHaveProperty("images");
-        expect(tracks).toHaveProperty("artists");
-        expect(tracks).toHaveProperty("name");
-        expect(tracks).toHaveProperty("id");
+        expect(firstTrack).toHaveProperty("album");
+        expect(firstTrack.album).toHaveProperty("images");
+        expect(firstTrack).toHaveProperty("artists");
+        expect(firstTrack).toHaveProperty("name");
+        expect(firstTrack).toHaveProperty("id");
     });
 });
 
