@@ -1,6 +1,6 @@
 import supertest from 'supertest';
 import { generateRandomString } from '../../utils/helpers';
-import { app, startServer } from '../../server.js';
+import { app } from '../../server.js';
 /* Notes
 - describe / it syntax is used to group related tests together
 - within a describe block, each it block represents an individual test case

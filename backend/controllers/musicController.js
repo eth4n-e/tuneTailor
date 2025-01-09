@@ -21,7 +21,7 @@ export const fetchLikedSongs = async (req, res) => {
             tracks = trackData.items.map(item => item.track);
         }
 
-        res.status(201).json({
+        res.status(200).json({
             tracks: tracks,
             nextPage: trackData.next
         }); 
@@ -79,7 +79,7 @@ export const fetchTopTracks = async (req, res) => {
             tracks = trackData.items;
         }
 
-        res.status(201).json({
+        res.status(200).json({
             tracks: tracks,
             nextPage: trackData.next
         }); 
