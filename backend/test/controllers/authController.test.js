@@ -9,6 +9,10 @@ import { app } from '../../server.js';
 */
 // let server;
 
+afterEach(() => {
+    jest.clearAllMocks();
+})
+
 test('POST /api/auth/redirectToSpotify', async () => {
     try {
         const codeChallenge = generateRandomString(64);

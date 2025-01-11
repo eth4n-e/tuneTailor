@@ -9,6 +9,10 @@ const MOCK_CODE = "code";
 const MOCK_CODE_VERIFIER = "codeVerifier";
 const TOKEN_TIME_LIMIT = 3600;
 
+afterEach(() => {
+    jest.clearAllMocks();
+})
+
 describe('retrieving access token controller', () => {
     it('should request the spotify token endpoint and return the token successfully', async () => {
         const MOCK_TOKEN_DATA = {

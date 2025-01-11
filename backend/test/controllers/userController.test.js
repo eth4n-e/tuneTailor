@@ -1,3 +1,7 @@
+afterEach(() => {
+    jest.clearAllMocks();
+})
+
 describe('user login', () => {
     it('should create a new user if they do not yet exist', async () => {
 

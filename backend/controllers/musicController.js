@@ -49,7 +49,10 @@ export const fetchPlaylists = async (req, res) => {
 
         const playlistData = await playlistResponse.json();
 
-        return res.status(200).json({playlists: playlistData});
+        return res.status(200).json({
+            playlists: playlistData.items,
+            nextPage: playlistData.next
+        });
     }  catch (err) {
         console.log(err);
         res.status(401).json({error: "Unable to fetch user's playlists"});
